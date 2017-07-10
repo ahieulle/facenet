@@ -49,10 +49,12 @@ def main(args):
         with tf.Session() as sess:
 
             # Read the file containing the pairs used for testing
-            pairs = lfw.read_pairs(os.path.expanduser(args.lfw_pairs))
-            print('Number of pairs : {0}'.format(pairs.shape) )
+            # pairs = lfw.read_pairs(os.path.expanduser(args.lfw_pairs))
+            # print('Number of pairs : {0}'.format(pairs.shape) )
             # Get the paths for the corresponding images
-            paths, actual_issame = lfw.get_paths(os.path.expanduser(args.lfw_dir), pairs, args.lfw_file_ext)
+            # paths, actual_issame = lfw.get_paths(os.path.expanduser(args.lfw_dir), pairs, args.lfw_file_ext)
+            import get_celebrities
+            paths, actual_issame = get_celebrities.generate_celebrities_pairs(args.lfw_dir)
             t_ = time.time()
             # Load the model
             facenet.load_model(args.model)
