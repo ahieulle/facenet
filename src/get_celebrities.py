@@ -111,7 +111,7 @@ def generate_celebrities_pairs(images_dir, nb_pairs=10000):
 
     p = np.random.permutation(len(issame))
 
-    pairs = np.array(pairs)[p]
-    issame = np.array(issame)[p]
+    pairs = np.array(pairs)[p].tolist()
+    issame = np.array(issame)[p].tolist()
 
     return pairs, issame
