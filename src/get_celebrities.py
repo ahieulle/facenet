@@ -1,9 +1,15 @@
 import os
 import unicodedata
 import urllib
-from urllib.request import HTTPError
 import random
-from http.client import RemoteDisconnected
+
+try:
+    from urllib.request import HTTPError
+    from http.client import RemoteDisconnected
+except ImportError:
+    pass
+
+
 from pandas import read_csv, DataFrame
 
 path = os.path.join("data", "celebrities", "celebrities.csv")
