@@ -88,7 +88,7 @@ def main(args):
                 emb_array[start_index:end_index,:] = sess_output
                 np.save("data/emb_array", emb_array)
                 print('Processing batch {0} : {1:0.2f}'.format(i, time.time() - t_))
-                break
+                # break
             tpr, fpr, accuracy, val, val_std, far = lfw.evaluate(emb_array,
                 actual_issame, nrof_folds=args.lfw_nrof_folds)
 
