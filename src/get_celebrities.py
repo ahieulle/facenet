@@ -9,7 +9,7 @@ try:
 except ImportError:
     pass
 
-
+import numpy as np
 from pandas import read_csv, DataFrame
 
 path = os.path.join("data", "celebrities", "celebrities.csv")
