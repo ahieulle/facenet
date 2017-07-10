@@ -2,7 +2,7 @@ import os
 import unicodedata
 import urllib
 import random
-
+import itertools
 try:
     from urllib.request import HTTPError
     from http.client import RemoteDisconnected
@@ -111,7 +111,7 @@ def generate_celebrities_pairs(images_dir, nb_pairs=10000):
 
     p = np.random.permutation(len(issame))
 
-    pairs = np.array(pairs)[p].tolist()
+    pairs = list(itertools.chain.from_iterable(np.array(pairs)[p]))
     issame = np.array(issame)[p].tolist()
 
     return pairs, issame
