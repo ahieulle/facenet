@@ -12,23 +12,21 @@ except ImportError:
 import numpy as np
 from pandas import read_csv, DataFrame
 
-path = os.path.join("data", "celebrities", "celebrities.csv")
+def clean_names(name):
+    #rm unicode and accents
+    name = unicodedata.normalize('NFD', name).encode('ascii','ignore').decode('utf-8')
+    name = name.rstrip()
+    name = name.replace(" ","_")
+    name = name.replace(".","")
+    name = name.lower()
+    return name
 
-def get_celebrities(path):
+def get_celebrities():
+    path = os.path.join("data", "celebrities", "celebrities.csv")
     df = read_csv(path, sep="\t", header=None, encoding="utf-8")
     photos_columns = ["photo_{0}".format(i+1) for i in range(10)]
     df.columns = ["name"] + photos_columns
     df.fillna("", inplace=True)
-
-    def clean_names(name):
-        #rm unicode and accents
-        name = unicodedata.normalize('NFD', name).encode('ascii','ignore').decode('utf-8')
-        name = name.rstrip()
-        name = name.replace(" ","_")
-        name = name.replace(".","")
-        name = name.lower()
-        return name
-
 
     df["name"] = df["name"].apply(clean_names)
 
@@ -65,7 +63,56 @@ def get_celebrities(path):
 
     return wrongs
 
-def get_name(celeb_img):
+
+def get_celebrities_with_others():
+    path = os.path.join("data", "celebrities_with_others", "celebrities_with_others.csv")
+    def get_real_url(url):
+        google =  "https://www.google.fr/imgres?imgurl="
+        pattern = "&imgrefurl"
+        if google in url:
+            url = url.split(google)[1].split(pattern)[0]
+            url = urllib.parse.unquote(url)
+        return url
+
+    df = read_csv(path, sep="\t", encoding="utf-8")
+    df.columns = ["celeb1", "celeb2", "celeb3", "nfaces", "where", "link"]
+    df.fillna("", inplace=True)
+
+    for c in ["celeb1", "celeb2", "celeb3"]:
+        df[c] = df[c].apply(clean_names)
+
+    df["link"] = df["link"].apply(get_real_url)
+
+    wrong = []
+
+    for gr in df.groupby("celeb1"):
+        name = gr[0]
+        links = gr[1]["link"]
+
+        folder = os.path.join("data", "celebrities_with_others", name)
+        if not os.path.exists(folder):
+            os.mkdir(folder)
+
+        for i,url in enumerate(links):
+            namei = "{0}_{1}.png".format(name, i)
+            out = os.path.join(folder, namei)
+
+            print("Downloading {0} image : {1}".format(namei, url))
+            try:
+                urllib.request.urlretrieve(url, out)
+            except HTTPError:
+                wrong.append(url)
+            except RemoteDisconnected:
+                wrong.append(url)
+            except Exception:
+                wrong.append(url)
+
+    return wrong
+
+
+
+
+def get_celebrities_name(celeb_img):
     sp = celeb_img.split("_")
     if len(sp) == 2:
         return sp[0]
@@ -84,7 +131,7 @@ def generate_celebrities_pairs(images_dir, nb_pairs=10000):
         for celeb_img in os.listdir(os.path.join(images_dir,celeb_dir)):
             images_path.append(os.path.join(images_dir,celeb_dir,celeb_img))
             photo_names.append(celeb_img)
-            celeb.append(get_name(celeb_img))
+            celeb.append(get_celebrities_name(celeb_img))
 
     pairs = []
     issame = []
