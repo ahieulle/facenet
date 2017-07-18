@@ -35,7 +35,7 @@ def get_celebrities():
         name = row["name"]
 
         wrong = []
-        folder = os.path.join("data", "celebrities", name)
+        folder = os.path.join("data", "celebrities", "raw", name)
         if not os.path.exists(folder):
             os.mkdir(folder)
 
@@ -46,6 +46,8 @@ def get_celebrities():
             print("Downloading {0} image : {1}".format(name, url))
             namei = "{0}_{1}.png".format(name, i)
             path = os.path.join(folder, namei)
+
+            url = get_real_url(url)
             try:
                 urllib.request.urlretrieve(url, path)
             except HTTPError:
@@ -63,16 +65,18 @@ def get_celebrities():
 
     return wrongs
 
+def get_real_url(url):
+    google =  "https://www.google.fr/imgres?imgurl="
+    pattern = "&imgrefurl"
+    if google in url:
+        url = url.split(google)[1].split(pattern)[0]
+        url = urllib.parse.unquote(url)
+    return url
+
+
 
 def get_celebrities_with_others():
     path = os.path.join("data", "celebrities_with_others", "celebrities_with_others.csv")
-    def get_real_url(url):
-        google =  "https://www.google.fr/imgres?imgurl="
-        pattern = "&imgrefurl"
-        if google in url:
-            url = url.split(google)[1].split(pattern)[0]
-            url = urllib.parse.unquote(url)
-        return url
 
     df = read_csv(path, sep="\t", encoding="utf-8")
     df.columns = ["celeb1", "celeb2", "celeb3", "nfaces", "where", "link"]
