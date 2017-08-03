@@ -172,12 +172,12 @@ def como_automatic_tagging(cut=0.9):
             f.write("\n")
 
 
-def celebrities_automatic_tagging():
+def celebrities_automatic_tagging(cut=0.9):
     model = "models/20170512-110547"
-    celeb_dir = "data/celebrities/mtcnnpy_160"
+    celeb_dir = "data/celebrities/faces"
     celeb_others_dir = "data/celebrities_with_others/faces"
-    # out = "data/como_pictures/tagging_cut_{0}.txt".format(str(cut).replace(".","_"))
-    out = "data/celebrities_with_others/tagging_f2.txt"
+    out = "data/celebrities_with_others/tagging_cut_{0}.txt".format(str(cut).replace(".","_"))
+    # out = "data/celebrities_with_others/tagging_f2.txt"
     celeb_images, celeb_labels, celeb_photo_names = load_images(celeb_dir, celeb=True)
     celeb_others_images, celeb_others_labels, celeb_others_photo_names = load_celeb_others_pictures(celeb_others_dir)
 
@@ -204,8 +204,8 @@ def celebrities_automatic_tagging():
             idx = celeb_others_labels_df.loc[celeb_others_labels_df["celeb_others_labels"] == photo,:].index
 
             for dist_i, ind_i in zip(dist[idx], ind[idx]):
-                # if dist_i[0] >= cut:
-                #     continue
+                if dist_i[0] >= cut:
+                    continue
                 # guy = emp_labels_df.loc[ind_i[0], "emp_labels"]
                 # tagged.append(guy)
                 guys = celeb_labels_df.loc[ind_i[0:2], "celeb_labels"]
@@ -221,6 +221,28 @@ def celebrities_automatic_tagging():
             f.write("\n")
 
 
+def read_result(cut):
+    out = "data/celebrities_with_others/tagging_cut_{0}.txt".format(str(cut).replace(".","_"))
+    res = []
+    with open(out, "r") as f:
+        for line in f:
+            line = line.replace("\n", "")
+            res.append(line.split("\t"))
+    return res
+
+def analyze_result(res):
+    count = 0
+    pics = []
+    for r in res:
+        found = False
+        for f in r[1:]:
+            if f in r[0]:
+                count += 1
+                found = True
+
+        if not found:
+            pics.append(r)
+    return count, pics
 
 
 if __name__ == '__main__':
