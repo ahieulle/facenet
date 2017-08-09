@@ -12,6 +12,28 @@ except ImportError:
 import numpy as np
 from pandas import read_csv, DataFrame
 
+def get_training_celebrities():
+    path = os.path.join("data", "training_celebrities.csv")
+    df = read_csv(path, sep="\t", header=None, encoding="utf-8")
+    df.columns = ["id", "full_name"]
+    df["lang"] = df["full_name"].apply(lambda x : x.split("@")[-1])
+
+    eng = df.loc[df["lang"] == "en",:]
+    eng["name"] = eng["full_name"].apply(clean_names)
+    return eng
+
+def search_name(eng,name):
+    eng[name] = eng["name"].apply(lambda x: True if name in str(x) else False)
+    return eng.loc[eng[name],:]
+
+def get_100_celeb_names():
+    path = os.path.join("data", "celebrities", "celebrities.csv")
+    df = read_csv(path, sep="\t", header=None, encoding="utf-8")
+    photos_columns = ["photo_{0}".format(i+1) for i in range(10)]
+    df.columns = ["name"] + photos_columns
+    names = list(df["name"])
+    return names
+
 def clean_names(name):
     #rm unicode and accents
     name = unicodedata.normalize('NFD', name).encode('ascii','ignore').decode('utf-8')
