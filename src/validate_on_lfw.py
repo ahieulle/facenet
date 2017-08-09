@@ -43,18 +43,18 @@ from scipy.optimize import brentq
 from scipy import interpolate
 
 def main(args):
-
+    t0 = time.time()
     with tf.Graph().as_default():
 
         with tf.Session() as sess:
 
             # Read the file containing the pairs used for testing
-            # pairs = lfw.read_pairs(os.path.expanduser(args.lfw_pairs))
-            # print('Number of pairs : {0}'.format(pairs.shape) )
+            pairs = lfw.read_pairs(os.path.expanduser(args.lfw_pairs))
+            print('Number of pairs : {0}'.format(pairs.shape) )
             # Get the paths for the corresponding images
-            # paths, actual_issame = lfw.get_paths(os.path.expanduser(args.lfw_dir), pairs, args.lfw_file_ext)
-            import get_celebrities
-            paths, actual_issame = get_celebrities.generate_celebrities_pairs(args.lfw_dir)
+            paths, actual_issame = lfw.get_paths(os.path.expanduser(args.lfw_dir), pairs, args.lfw_file_ext)
+            # import get_celebrities
+            # paths, actual_issame = get_celebrities.generate_celebrities_pairs(args.lfw_dir)
             t_ = time.time()
             # Load the model
             facenet.load_model(args.model)
@@ -67,7 +67,7 @@ def main(args):
             #image_size = images_placeholder.get_shape()[1]  # For some reason this doesn't work for frozen graphs
             image_size = args.image_size
             embedding_size = embeddings.get_shape()[1]
-            print('embedding_size : {0}'.format(embedding_size))
+            # print('embedding_size : {0}'.format(embedding_size))
             # Run forward pass to calculate embeddings
             print('Runnning forward pass on LFW images')
             batch_size = args.lfw_batch_size
@@ -80,13 +80,13 @@ def main(args):
                 start_index = i*batch_size
                 end_index = min((i+1)*batch_size, nrof_images)
                 paths_batch = paths[start_index:end_index]
-                print("len(paths_batch) : {0}".format(len(paths_batch)))
+                # print("len(paths_batch) : {0}".format(len(paths_batch)))
                 images = facenet.load_data(paths_batch, False, False, image_size)
                 feed_dict = { images_placeholder:images, phase_train_placeholder:False }
                 sess_output = sess.run(embeddings, feed_dict=feed_dict)
-                print('sess_output.shape : {0}'.format(sess_output.shape))
+                # print('sess_output.shape : {0}'.format(sess_output.shape))
                 emb_array[start_index:end_index,:] = sess_output
-                np.save("data/emb_array", emb_array)
+                # np.save("data/emb_array", emb_array)
                 print('Processing batch {0} : {1:0.2f}'.format(i, time.time() - t_))
                 # break
             tpr, fpr, accuracy, val, val_std, far = lfw.evaluate(emb_array,
@@ -99,6 +99,7 @@ def main(args):
             print('Area Under Curve (AUC): %1.3f' % auc)
             eer = brentq(lambda x: 1. - x - interpolate.interp1d(fpr, tpr)(x), 0., 1.)
             print('Equal Error Rate (EER): %1.3f' % eer)
+    print('Total time : {0:0.2f}'.format(i, time.time() - t0))
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
