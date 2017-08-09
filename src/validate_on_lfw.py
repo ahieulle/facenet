@@ -75,6 +75,8 @@ def main(args):
             print('Number of images : {0}'.format(nrof_images))
             nrof_batches = int(math.ceil(1.0*nrof_images / batch_size))
             emb_array = np.zeros((nrof_images, embedding_size))
+
+            processing_times = []
             for i in range(nrof_batches):
                 t_ = time.time()
                 start_index = i*batch_size
@@ -87,7 +89,8 @@ def main(args):
                 # print('sess_output.shape : {0}'.format(sess_output.shape))
                 emb_array[start_index:end_index,:] = sess_output
                 # np.save("data/emb_array", emb_array)
-                print('Processing batch {0} : {1:0.2f}'.format(i, time.time() - t_))
+                # print('Processing batch {0} : {1:0.2f}'.format(i, time.time() - t_))
+                processing_times.append(time.time() - t_)
                 # break
             tpr, fpr, accuracy, val, val_std, far = lfw.evaluate(emb_array,
                 actual_issame, nrof_folds=args.lfw_nrof_folds)
@@ -100,6 +103,7 @@ def main(args):
             eer = brentq(lambda x: 1. - x - interpolate.interp1d(fpr, tpr)(x), 0., 1.)
             print('Equal Error Rate (EER): %1.3f' % eer)
     print('Total time : {0:0.2f}'.format(i, time.time() - t0))
+    print('Mean Batch processing time : {0:0.2f}'.format(np.mean(processing_times)))
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
