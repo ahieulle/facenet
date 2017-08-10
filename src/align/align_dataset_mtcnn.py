@@ -34,9 +34,11 @@ import numpy as np
 import facenet
 import align.detect_face
 import random
+import time
 from time import sleep
 
 def main(args):
+    t0 = time.time()
     sleep(random.random())
     output_dir = os.path.expanduser(args.output_dir)
     if not os.path.exists(output_dir):
@@ -155,7 +157,7 @@ def main(args):
 
     print('Total number of images: %d' % nrof_images_total)
     print('Number of successfully aligned images: %d' % nrof_successfully_aligned)
-
+    print('Total time : {0:0.2f}'.format( time.time() - t0)
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
