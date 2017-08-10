@@ -102,7 +102,7 @@ def main(args):
             print('Area Under Curve (AUC): %1.3f' % auc)
             eer = brentq(lambda x: 1. - x - interpolate.interp1d(fpr, tpr)(x), 0., 1.)
             print('Equal Error Rate (EER): %1.3f' % eer)
-    print('Total time : {0:0.2f}'.format(i, time.time() - t0))
+    print('Total time : {0:0.2f}'.format(time.time() - t0))
     print('Mean Batch processing time : {0:0.2f}'.format(np.mean(processing_times)))
 
 def parse_arguments(argv):
