@@ -157,7 +157,7 @@ def main(args):
 
     print('Total number of images: %d' % nrof_images_total)
     print('Number of successfully aligned images: %d' % nrof_successfully_aligned)
-    print('Total time : {0:0.2f}'.format( time.time() - t0)
+    print('Total time : {0:0.2f}'.format( time.time() - t0))
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
