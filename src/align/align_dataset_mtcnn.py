@@ -95,7 +95,13 @@ def main(args):
                             img = facenet.to_rgb(img)
                         img = img[:,:,0:3]
 
-                        bounding_boxes, _ = align.detect_face.detect_face(img, minsize, pnet, rnet, onet, threshold, factor)
+                        try:
+                            bounding_boxes, _ = align.detect_face.detect_face(img, minsize, pnet, rnet, onet, threshold, factor)
+                        except ValueError:
+                            print('Unable to align "%s"' % image_path)
+                            text_file.write('%s\n' % (output_filename))
+                            continue
+
                         nrof_faces = bounding_boxes.shape[0]
                         if nrof_faces>0:
                             det = bounding_boxes[:,0:4]
